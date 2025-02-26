@@ -1,0 +1,14 @@
+extends ../_partials/_template
+
+block vars
+	- var name = "Home"
+	- var nameID = "home"
+	- var prev = ""
+	- var next = "About"
+
+block main
+	<h1>Home</h1>
+	<button onclick="openPDF('http://www.google.com')">Open Google</button>
+	<button onclick="openPDF()">Open PDF</button>
+
+block modal

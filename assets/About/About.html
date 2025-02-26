@@ -1,0 +1,222 @@
+<!DOCTYPE html><html lang="en" id="html"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><meta http-equiv="X-UA-Compatible" content="ie=edge"><meta name="format-detection" content="telephone=no"><title>BOILERPLATE - About</title><link rel="stylesheet" href="../shared/css/global.css"><link rel="stylesheet" href="css/page.css"><style>html {
+	animation: fadeSiteIn 1s ease forwards; /* [1] */
+}
+
+html.fadeSiteOut {
+	animation:  fadeSiteOut 0.5s ease forwards; /* [2] */
+}
+
+@keyframes fadeSiteIn { /* [1] */
+	from   { opacity: 0; }
+	to    { opacity: 1; }
+}
+
+@keyframes fadeSiteOut { /* [2] */
+	from   { opacity: 1; }
+	to     { opacity: 0; }
+}
+
+
+</style><script>if (typeof module === 'object') {window.module = module; module = undefined;}
+</script><script src="../shared/js/jquery.min.js"></script><script src="../shared/js/jquery.tap.js"></script><script src="../shared/js/jquery.touchSwipe.min.js"></script><script src="../shared/js/jquery.idleTimer.min.js"></script><script>if (window.module) module = window.module;
+	
+</script><script>$(function () {
+	$('body').bind('touchmove', function (e) {
+		e.preventDefault();
+	});
+});
+</script><script>// Stats Collection and Management
+
+// (write only) Count page views
+let statsViews = parseInt(localStorage.getItem(`stats-About-views`))
+if (!statsViews){
+	statsViews = 0
+}
+statsViews = statsViews+1
+localStorage.setItem(`stats-About-views`, statsViews)
+
+// (read + write) Count when timeouts occur and screensaver is launched
+let statsTimouts = parseInt(localStorage.getItem(`stats-About-timeouts`))
+if (!statsTimouts){
+	statsTimouts = 0
+}
+
+function logTimeout(){
+	// $('#screensaver').fadeIn(1000);
+	idleDate = new Date();
+	statsTimouts = statsTimouts+1
+	localStorage.setItem(`stats-About-timeouts`, statsTimouts)
+	window.location.href = "../Home/Home.html";
+}
+
+// (read + write) Log sessions, subtracting idle time
+let statsSessions = localStorage.getItem(`stats-About-sessions`)
+if (!statsSessions){
+	statsSessions = []
+}
+else{
+	statsSessions = JSON.parse(statsSessions)
+}
+
+let startDate = new Date();
+let idleDate
+//- let timeout = 360000
+let timeout = 120000
+
+const beforeunload = function() {
+	const endDate = new Date();
+	let activeTime
+	if(idleDate){
+		activeTime = (idleDate.getTime() - startDate.getTime() - timeout)
+	}
+	else{
+		activeTime = (endDate.getTime() - startDate.getTime())
+	}
+	statsSessions.push(activeTime)
+	localStorage.setItem(`stats-About-sessions`, JSON.stringify(statsSessions))
+}
+window.addEventListener('beforeunload', beforeunload);
+
+
+// Process sessions into min/max/avg time on page. Will overwrite any existing calculations.
+function processSessionData(){
+
+	let data = localStorage
+
+	const pages = ["Home","Patient-Profile","Risk","Efficacy","RAASi-Enablement","Safety","Summary","PI"]
+		
+	for (const page of pages) {
+
+		const dataName = `stats-${page}-sessions`
+
+		if (data[dataName]){
+
+			let arr = JSON.parse(data[dataName])
+
+			const min = parseInt(Math.min(...arr)/1000)
+			const max = parseInt(Math.max(...arr)/1000)
+			const sum = arr.reduce((a, b) => a + b, 0)
+			const avg = parseInt((sum / arr.length)/1000)
+
+			console.log(`${page} - ${min},${max},${avg}`);
+			localStorage.setItem(`stats-${page}-aggregate`, `${min},${max},${avg}`)
+		}
+		else{
+			console.log(`${page} - No data`)
+			localStorage.setItem(`stats-${page}-aggregate`, `-`)
+		}
+	}
+}
+
+// Export all stats to text file
+function exportStats(){
+	let statsData = localStorage
+	const filename = 'lokelma-stats.txt'
+
+	if(typeof statsData === "object"){
+		// sort data by key name
+		statsData = Object.keys(statsData).sort().reduce(
+			(obj, key) => { 
+				obj[key] = statsData[key]; 
+				return obj;
+			}, 
+			{}
+		);
+
+		statsData = JSON.stringify(statsData, undefined, 1)
+		// remove extra space at line start
+		statsData = statsData.replaceAll(' \"', '\"')
+		console.log(statsData)
+
+	}
+
+	var blob = new Blob([statsData], {type: 'text/json'}),
+		e = document.createEvent('MouseEvents'),
+		a = document.createElement('a')
+
+		// remove top and bottom brackets and extra lines
+		blob = blob.slice(2,-2)
+
+	a.download = filename
+	a.href = window.URL.createObjectURL(blob)
+	a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
+	e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+	a.dispatchEvent(e)
+}
+
+
+
+function clearStats(){
+	let text = "Are you sure you want to delete all the analytics data?";
+		if (confirm(text) == true) {
+			localStorage.clear()            
+		} 
+}</script></head><body class="about" data-next="" data-prev="Home"><script>
+    function toggleModal() { const popup = document.getElementById("admin-menu-popup"); popup.classList.toggle("open"); }
+</script>
+
+<style>
+  #admin-menu-button {position: absolute; top: 0; left: 0; z-index: 300; width: 50px; height: 50px;outline: 1px solid red;}
+  #admin-menu-popup { display: none; }
+  #admin-menu-popup.open {
+    display: flex; position: fixed; top: 0; left: 0; justify-content: center; align-items: center; opacity: 1; z-index: 300; transition: all 0.3s ease-in-out; background-color: rgba(0, 0, 0, 0.85); width: 100%; height: 100%; font-family: Arial;
+    .container { position: relative; border-radius: 20px; background: #fff; padding: 46px 100px 40px 50px; }
+    h1 { margin: 0 0 30px 0; color: #000000; font-size: 54px; }
+    p { margin: 0 0 10px; color: #000000; font-size: 46px; }
+    button { display: block; margin: 0 0 16px 0; padding: 8px 16px; font-size: 24px; }
+    #close-btn { position: absolute; top: 10px; right: 10px; padding: 10px; font-size: 32px; text-align: center; }
+  }
+</style>
+
+<div id="admin-menu-button" onclick="toggleModal()"></div>
+
+<div id="admin-menu-popup">
+  <div class="container">
+    <h1>Admin Menu</h1>
+    <button id="buttonCloseApp">Close App</button>
+    <button id="buttonEnterFullScreen">Enter Fullscreen</button>
+    <button id="buttonExitFullScreen">Exit Fullscreen</button>
+    <button onclick="exportStats()">Export Analytics Data</button>
+    <button onclick="clearStats()">DELETE Analytics Data</button>
+    <div id="close-btn" onclick="toggleModal()">✖</div>
+  </div>
+</div>
+<main><h1>About</h1></main><script>// Resize content to fill window while maintaining aspect ratio
+function zoomFit(){
+	let zoomyWidth =  window.innerWidth/1920;
+	let zoomyHeight =  window.innerHeight/1080;
+	let zoomy = Math.min(zoomyWidth, zoomyHeight);
+	const elem = document.getElementById("html");
+	if (zoomy !=1){
+	elem.style.zoom = zoomy;
+	elem.style.margin = "auto";
+	}
+}      
+window.addEventListener("load", zoomFit);
+window.addEventListener("resize", zoomFit);
+
+</script><script>$(function() {
+	
+	$(document).idleTimer(timeout); // timeout set in _stats.pug:38
+});
+
+$(function() {
+
+	$(document).on("idle.idleTimer", function(event, elem, obj) {
+	// function you want to fire when the user goes idle
+		// Do not timeout/reload if on homepage
+		let currentPage = 'About'
+		if( currentPage !== 'Home'){
+			logTimeout()
+		}
+		else{
+			console.log("Timout on homepage.")
+		}
+	});
+
+	$(document).on("active.idleTimer", function(event, elem, obj) {
+	// function you want to fire when the user goes active
+	});
+
+});
+</script><script src="../shared/js/global.js"></script><script src="../../renderer.js"></script></body></html>

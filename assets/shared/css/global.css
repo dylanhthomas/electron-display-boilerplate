@@ -1,0 +1,83 @@
+/* Global CSS */
+
+:root {
+  --white: #ffffff;
+}
+
+html {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  font-size: 1rem;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+
+body {
+  position: relative;
+  font-family: Arial, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  top: 0;
+  left: 0;
+  margin: 0 auto;
+  padding: 100px;
+  width: 1920px;
+  max-width: 1920px;
+  height: 1080px;
+  max-height: 1080px;
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+}
+
+html,
+div,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+header,
+main,
+footer {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+
+/* Variable content */
+/*
+.pink-content{
+    color: #FF53FF !important;
+}
+.pink-bracket::before, .pink-content::before {
+    content: "[";
+    color: #FF53FF;
+}
+.pink-bracket::after, .pink-content::after {
+    content: "]";
+    color: #FF53FF;
+}
+*/
+
+/* Screenshot automation */
+
+#ss_trigger {
+  width: 100px;
+  height: 100px;
+}

@@ -1,0 +1,116 @@
+block vars
+doctype html
+html(lang="en" id="html")
+	head
+		meta(charset='UTF-8')
+		meta(name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+		meta(http-equiv='X-UA-Compatible' content='ie=edge')
+		meta(name='format-detection' content='telephone=no')
+
+		title BOILERPLATE - #{name}
+		link(rel='stylesheet' href='../shared/css/global.css')
+		link(rel='stylesheet' href='css/page.css')
+
+		style.
+			html {
+				animation: fadeSiteIn 1s ease forwards; /* [1] */
+			}
+
+			html.fadeSiteOut {
+				animation:  fadeSiteOut 0.5s ease forwards; /* [2] */
+			}
+
+			@keyframes fadeSiteIn { /* [1] */
+				from   { opacity: 0; }
+				to    { opacity: 1; }
+			}
+
+			@keyframes fadeSiteOut { /* [2] */
+				from   { opacity: 1; }
+				to     { opacity: 0; }
+			}
+
+
+		
+		//- [ABOVE SCRIPTS] Allows imported scripts to work in Electron
+		script.
+			if (typeof module === 'object') {window.module = module; module = undefined;}
+
+		script(src='../shared/js/jquery.min.js')
+		script(src='../shared/js/jquery.tap.js')
+		script(src='../shared/js/jquery.touchSwipe.min.js')
+		script(src="../shared/js/jquery.idleTimer.min.js" )
+		
+		//- [BELOW SCRIPTS] Allows imported scripts to work in Electron
+		script.
+			if (window.module) module = window.module;
+				
+		
+		script.
+			$(function () {
+				$('body').bind('touchmove', function (e) {
+					e.preventDefault();
+				});
+			});
+
+		include _stats
+	block head
+
+
+	body(class=nameID data-next=next data-prev=prev)
+		include ../../menu.html
+		main
+			block main
+
+		block modal
+
+		script.
+			// Resize content to fill window while maintaining aspect ratio
+			function zoomFit(){
+				let zoomyWidth =  window.innerWidth/1920;
+				let zoomyHeight =  window.innerHeight/1080;
+				let zoomy = Math.min(zoomyWidth, zoomyHeight);
+				const elem = document.getElementById("html");
+				if (zoomy !=1){
+				elem.style.zoom = zoomy;
+				elem.style.margin = "auto";
+				}
+			}      
+			window.addEventListener("load", zoomFit);
+			window.addEventListener("resize", zoomFit);
+
+
+		script.
+
+			$(function() {
+				
+				$(document).idleTimer(timeout); // timeout set in _stats.pug:38
+			});
+
+			$(function() {
+
+				$(document).on("idle.idleTimer", function(event, elem, obj) {
+				// function you want to fire when the user goes idle
+					// Do not timeout/reload if on homepage
+					let currentPage = '#{name}'
+					if( currentPage !== 'Home'){
+						logTimeout()
+					}
+					else{
+						console.log("Timout on homepage.")
+					}
+				});
+
+				$(document).on("active.idleTimer", function(event, elem, obj) {
+				// function you want to fire when the user goes active
+				});
+
+			});
+
+		script(src='../shared/js/global.js')
+		script(src="../../renderer.js")
+		
+		block scriptsFooter
+
+
+

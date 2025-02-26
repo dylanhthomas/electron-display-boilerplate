@@ -1,0 +1,128 @@
+script.
+	// Stats Collection and Management
+
+	// (write only) Count page views
+	let statsViews = parseInt(localStorage.getItem(`stats-#{name}-views`))
+	if (!statsViews){
+		statsViews = 0
+	}
+	statsViews = statsViews+1
+	localStorage.setItem(`stats-#{name}-views`, statsViews)
+
+	// (read + write) Count when timeouts occur and screensaver is launched
+	let statsTimouts = parseInt(localStorage.getItem(`stats-#{name}-timeouts`))
+	if (!statsTimouts){
+		statsTimouts = 0
+	}
+
+	function logTimeout(){
+		// $('#screensaver').fadeIn(1000);
+		idleDate = new Date();
+		statsTimouts = statsTimouts+1
+		localStorage.setItem(`stats-#{name}-timeouts`, statsTimouts)
+		window.location.href = "../Home/Home.html";
+	}
+	
+	// (read + write) Log sessions, subtracting idle time
+	let statsSessions = localStorage.getItem(`stats-#{name}-sessions`)
+	if (!statsSessions){
+		statsSessions = []
+	}
+	else{
+		statsSessions = JSON.parse(statsSessions)
+	}
+
+	let startDate = new Date();
+	let idleDate
+	//- let timeout = 360000
+	let timeout = 120000
+
+	const beforeunload = function() {
+		const endDate = new Date();
+		let activeTime
+		if(idleDate){
+			activeTime = (idleDate.getTime() - startDate.getTime() - timeout)
+		}
+		else{
+			activeTime = (endDate.getTime() - startDate.getTime())
+		}
+		statsSessions.push(activeTime)
+		localStorage.setItem(`stats-#{name}-sessions`, JSON.stringify(statsSessions))
+	}
+	window.addEventListener('beforeunload', beforeunload);
+
+
+	// Process sessions into min/max/avg time on page. Will overwrite any existing calculations.
+	function processSessionData(){
+
+		let data = localStorage
+
+		const pages = ["Home","Patient-Profile","Risk","Efficacy","RAASi-Enablement","Safety","Summary","PI"]
+			
+		for (const page of pages) {
+
+			const dataName = `stats-${page}-sessions`
+
+			if (data[dataName]){
+
+				let arr = JSON.parse(data[dataName])
+
+				const min = parseInt(Math.min(...arr)/1000)
+				const max = parseInt(Math.max(...arr)/1000)
+				const sum = arr.reduce((a, b) => a + b, 0)
+				const avg = parseInt((sum / arr.length)/1000)
+
+				console.log(`${page} - ${min},${max},${avg}`);
+				localStorage.setItem(`stats-${page}-aggregate`, `${min},${max},${avg}`)
+			}
+			else{
+				console.log(`${page} - No data`)
+				localStorage.setItem(`stats-${page}-aggregate`, `-`)
+			}
+		}
+	}
+
+	// Export all stats to text file
+	function exportStats(){
+		let statsData = localStorage
+		const filename = 'lokelma-stats.txt'
+
+		if(typeof statsData === "object"){
+			// sort data by key name
+			statsData = Object.keys(statsData).sort().reduce(
+				(obj, key) => { 
+					obj[key] = statsData[key]; 
+					return obj;
+				}, 
+				{}
+			);
+
+			statsData = JSON.stringify(statsData, undefined, 1)
+			// remove extra space at line start
+			statsData = statsData.replaceAll(' \"', '\"')
+			console.log(statsData)
+
+		}
+
+		var blob = new Blob([statsData], {type: 'text/json'}),
+			e = document.createEvent('MouseEvents'),
+			a = document.createElement('a')
+
+			// remove top and bottom brackets and extra lines
+			blob = blob.slice(2,-2)
+
+		a.download = filename
+		a.href = window.URL.createObjectURL(blob)
+		a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
+		e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+		a.dispatchEvent(e)
+	}
+
+
+
+	function clearStats(){
+		let text = "Are you sure you want to delete all the analytics data?";
+			if (confirm(text) == true) {
+				localStorage.clear()            
+			} 
+	}

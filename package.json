@@ -1,0 +1,29 @@
+{
+  "name": "BOILERPLATE",
+  "version": "0.0.0",
+  "description": "BOILERPLATE Interactive Display",
+  "main": "main.js",
+  "author": "",
+  "license": "",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "capture-website": "^4.2.0",
+    "electron": "^29.0.0",
+    "prettier-plugin-css-order": "^2.1.2",
+    "puppeteer": "^24.2.1"
+  },
+  "build": {
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  }
+}
