@@ -17,6 +17,9 @@ Include the `renderer.js` at the end of every page: `<script src="../renderer.js
 
 
 
+## Build
+`npx electron-builder build`
+
 
 ### supports swiping
 
