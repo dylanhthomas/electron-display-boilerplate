@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "capture-website": "^4.2.0",
-    "electron": "^29.0.0",
+    "electron": "^35.7.5",
     "prettier-plugin-css-order": "^2.1.2",
     "puppeteer": "^24.2.1"
   },
